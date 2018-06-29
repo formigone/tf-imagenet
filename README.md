@@ -6,11 +6,12 @@
 
 ### To do
 
- [ ] Create some plumbing for training/eval and testing
- [ ] Create a model
- [ ] Write a csv-tfrecord converter
- [ ] Write tfrecord generator from list of files (for test images)
- [ ] Write a submission formatter
+ - [x] Upload all images to Google cloud storage
+ - [ ] Create some plumbing for training/eval and testing
+ - [ ] Create a model
+ - [ ] Write a csv-tfrecord converter
+ - [ ] Write tfrecord generator from list of files (for test images)
+ - [ ] Write a submission formatter
 
 ### Datasets
 

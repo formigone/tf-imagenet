@@ -17,7 +17,7 @@
 
 | Type | Size |
 |---|---|
-| Train | 50,000 |
+| Train | 544,547 |
 | Validation | 50,000 |
 | Test | 100,000 |
 

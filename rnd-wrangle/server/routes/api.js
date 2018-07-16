@@ -4,8 +4,11 @@ const samples = require('../services/samples');
 
 const router = express.Router();
 
-router.get('/samples', (req, res) => {
-  samples.fetch(250, 2)
+const NUM_DIRS = 25;
+const PER_DIR = 4;
+
+router.get('/samples/:numDirs?/:perDir?', (req, res) => {
+  samples.fetch(Number(req.params.numDirs || NUM_DIRS), Number(req.params.perDir || PER_DIR))
     .then((images) => {
       res.json({ images });
     })
@@ -14,13 +17,14 @@ router.get('/samples', (req, res) => {
     });
 });
 
-router.get('/samples/:img', async(req, res) => {
+router.get('/samples/:img/:width/:height', async(req, res) => {
   let path = req.params.img;
   path = path.replace(/^\w+\//, '');
   path = path.replace(/\.\w+$/, '');
+  const { width, height } = req.params;
 
   try {
-    const box = await samples.getBox(path);
+    const box = await samples.getBox(path, Number(width), Number(height));
     res.json(box);
   } catch (err) {
     res.status(500).json({ error: err.message });

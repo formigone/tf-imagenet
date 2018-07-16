@@ -23,6 +23,7 @@ fs.readFile(SYNSET_PATH, 'utf8', (err, data) => {
       }
       synset[parts[1]] = parts[2].split(',').map((word) => word.trim());
   });
+  console.log('Synsets ready');
 });
 
 fs.readFile(LOG_PATH, 'utf8', (err, data) => {
@@ -46,17 +47,16 @@ fs.readFile(LOG_PATH, 'utf8', (err, data) => {
         }
         group.boxes.push({
           label: groups[i],
+          // y_min, x_min, y_max, x_max
           box: [Number(groups[i + 2]), Number(groups[i + 1]), Number(groups[i + 4]), Number(groups[i + 3])],
         });
       }
     }
 
-    if (index === 1) {
-      console.log('sample group: ' + JSON.stringify(group));
-    }
-
     mapping[parts[0]] = group;
-  })
+  });
+  
+  console.log('Boxes map ready');
 });
 
 const samples = {
@@ -78,7 +78,6 @@ const samples = {
         dirs.forEach((dir) => {
           fs.readdir(`${SAMPLES_PATH}/${dir}`, (err, files) => {
             for (let j = 0; j < maxPerDir; j++) {
-              console.log(` ${dir}/${files[j]}`);
               images.push(`${dir}/${files[j]}`);
             }
 
@@ -90,10 +89,19 @@ const samples = {
       })
     });
   },
-  getBox(path) {
+  getBox(path, width, height) {
     return new Promise((resolve, reject) => {
       if (path in mapping) {
-        return resolve(mapping[path]);
+        const boxes = { ...mapping[path] };
+
+        boxes.path = path;
+        boxes.boxes = boxes.boxes.map((box) => {
+          box.synset = synset[box.label] || ['N/A'];
+          box.pct = [box.box[0] / height, box.box[1] / width, box.box[2] / height, box.box[3] / width];
+          return box;
+        });
+
+        resolve(boxes);
       }
 
       reject(new Error('Mapping not found'));

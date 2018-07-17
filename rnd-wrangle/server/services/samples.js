@@ -7,57 +7,78 @@ const SYNSET_PATH = `${__dirname}/../../../LOC_synset_mapping.txt`;
 const mapping = {};
 const synset = {};
 
-fs.readFile(SYNSET_PATH, 'utf8', (err, data) => {
-  if (err) {
-    throw err;
-  }
-
-  data.split('\n').forEach((line, index) => {
-      if (!line) {
-        return;
+function parseSynsets(path) {
+  return new Promise((resolve, reject) => {
+    fs.readFile(path, 'utf8', (err, data) => {
+      if (err) {
+        return reject(err);
       }
 
-      const parts = line.match(/^(n\d+)\s(.*?)$/);
-      if (!parts || parts.length !== 3) {
-        console.log(' bad parts: ' + line);
-      }
-      synset[parts[1]] = parts[2].split(',').map((word) => word.trim());
-  });
-  console.log('Synsets ready');
-});
-
-fs.readFile(LOG_PATH, 'utf8', (err, data) => {
-  if (err) {
-    throw err;
-  }
-
-  data.split('\n').forEach((line, index) => {
-    if (index === 0) {
-      return;
-    }
-
-    //   'n02017213_1193,n02017213 80 150 381 455 n02017213 176 33 426 215 ',
-    const parts = line.split(',');
-    const group = { boxes: []};
-    if (parts.length === 2) {
-      const groups = parts[1].split(' ');
-      for (let i = 0; i < groups.length; i += 5) {
-        if (!groups[i]) {
-          continue;
+      data.split('\n').forEach((line, index) => {
+        if (!line) {
+          return;
         }
-        group.boxes.push({
-          label: groups[i],
-          // y_min, x_min, y_max, x_max
-          box: [Number(groups[i + 2]), Number(groups[i + 1]), Number(groups[i + 4]), Number(groups[i + 3])],
-        });
-      }
-    }
 
-    mapping[parts[0]] = group;
+        const parts = line.match(/^(n\d+)\s(.*?)$/);
+        if (!parts || parts.length !== 3) {
+          console.log(' bad parts: ' + line);
+        }
+        synset[parts[1]] = parts[2].split(',').map((word) => word.trim());
+      });
+
+      resolve(synset);
+    });
   });
-  
-  console.log('Boxes map ready');
-});
+}
+
+function parseObjects(path) {
+  return new Promise((resolve, reject) => {
+    fs.readFile(path, 'utf8', (err, data) => {
+      if (err) {
+        return reject(err);
+      }
+
+      data.split('\n').forEach((line, index) => {
+        if (index === 0) {
+          return;
+        }
+
+        //   'n02017213_1193,n02017213 80 150 381 455 n02017213 176 33 426 215 ',
+        const parts = line.split(',');
+        const group = { boxes: []};
+        if (parts.length === 2) {
+          const groups = parts[1].split(' ');
+          for (let i = 0; i < groups.length; i += 5) {
+            if (!groups[i]) {
+              continue;
+            }
+            group.boxes.push({
+              label: groups[i],
+              // y_min, x_min, y_max, x_max
+              box: [Number(groups[i + 2]), Number(groups[i + 1]), Number(groups[i + 4]), Number(groups[i + 3])],
+            });
+          }
+        }
+
+        mapping[parts[0]] = group;
+      });
+
+      resolve(mapping);
+    });
+  });
+}
+
+parseSynsets(SYNSET_PATH)
+  .then(() => {
+    console.log('Synsets ready');
+    return parseObjects(LOG_PATH);
+  })
+  .then(() => {
+    console.log('Boxes map ready');
+  })
+  .catch((err) => {
+    console.error('Error parsing synsets', err);
+  });
 
 const samples = {
   fetch(numDirs = 5, maxPerDir = 3) {
@@ -98,6 +119,7 @@ const samples = {
         boxes.boxes = boxes.boxes.map((box) => {
           box.synset = synset[box.label] || ['N/A'];
           box.pct = [box.box[0] / height, box.box[1] / width, box.box[2] / height, box.box[3] / width];
+          box.rot90 = [box.pct[1], 1 - box.pct[2], box.pct[3], 1 - box.pct[0]];
           return box;
         });
 

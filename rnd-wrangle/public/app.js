@@ -11,7 +11,7 @@ function drawBoundingBox(image) {
       }
 
 
-      [/*'rot270', 'rot180', */'rot90'].forEach((className) => {
+      ['rot270', 'rot180', 'rot90'].forEach((className) => {
         const clone = image.cloneNode();
         clone.classList.add(className);
         clone.addEventListener('load', () => label({ boxes, image: clone, width, height, path, coords: className }));
@@ -51,7 +51,7 @@ function label({ boxes, image, width, height, path, coords }) {
     }
 
     image.parentNode.appendChild(boundingBox);
-    boundingBox.appendChild(dfrag('span', { className: 'label' }, `${synset[0]}`));
+    boundingBox.appendChild(dfrag('span', { className: 'label', style: `top: ${parseInt(pct[0] * 100, 10) > 6 ? -27 : 0}px; left: -3px` }, `${synset[0]}`));
   });
 }
 
@@ -62,7 +62,7 @@ function boundingBox() {
   });
 }
 
-fetch('/api/samples/10/2')
+fetch('/api/samples/800/2')
   .then((res) => res.json())
   .then((samples) => {
     const images = dfrag('div', { className: 'container' }, (

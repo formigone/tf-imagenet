@@ -120,6 +120,8 @@ const samples = {
           box.synset = synset[box.label] || ['N/A'];
           box.pct = [box.box[0] / height, box.box[1] / width, box.box[2] / height, box.box[3] / width];
           box.rot90 = [box.pct[1], 1 - box.pct[2], box.pct[3], 1 - box.pct[0]];
+          box.rot180 = [box.rot90[1], 1 - box.rot90[2], box.rot90[3], 1 - box.rot90[0]];
+          box.rot270 = [box.rot180[1], 1 - box.rot180[2], box.rot180[3], 1 - box.rot180[0]];
           return box;
         });
 

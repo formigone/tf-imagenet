@@ -21,7 +21,7 @@ def gen_input(filename, batch_size=16, repeat=1, buffer_size=1, img_shape=(299, 
     img = tf.decode_raw(parsed['img'], tf.float32)
     img = tf.reshape(img, img_shape)
 
-    return img, parsed['class']
+    return img / 256, parsed['class']
 
   def input_fn():
     dataset = (tf.data.TFRecordDataset(filename)).map(decode)

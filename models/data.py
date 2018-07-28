@@ -3,7 +3,7 @@ from __future__ import division
 import tensorflow as tf
 
 
-def gen_input(filename, batch_size=16, repeat=1, buffer_size=1, img_shape=(299, 299, 3)):
+def gen_input(filename, batch_size=16, repeat=1, buffer_size=1, img_shape=(128, 128, 3)):
   tf.logging.debug('input_fn: {}'.format({
     'batch_size': batch_size,
     'repeat': repeat,

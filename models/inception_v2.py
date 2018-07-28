@@ -23,7 +23,14 @@ trunc_normal = lambda stddev: init_ops.truncated_normal_initializer(0.0, stddev)
 
 
 def model_fn(features, labels, mode, params):
-  training = mode == tf.estimator.ModeKeys.TRAIN
+  """
+  Based on https://github.com/tensorflow/tpu/blob/master/models/experimental/inception/inception_v2_tpu_model.py
+  :param features:
+  :param labels:
+  :param mode:
+  :param params:
+  :return:
+  """
   tf.summary.image('0_input', features, max_outputs=4)
 
   # 224 x 224 x 3

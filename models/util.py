@@ -1,6 +1,33 @@
 import tensorflow as tf
 
 
+def _reduced_kernel_size_for_small_input(input_tensor, kernel_size):
+  """Define kernel size which is automatically reduced for small input.
+  If the shape of the input images is unknown at graph construction time this
+  function assumes that the input images are is large enough.
+  Args:
+    input_tensor: input tensor of size [batch_size, height, width, channels].
+    kernel_size: desired kernel size of length 2: [kernel_height, kernel_width]
+  Returns:
+    a tensor with the kernel size.
+  TODO(jrru): Make this function work with unknown shapes. Theoretically, this
+  can be done with the code below. Problems are two-fold: (1) If the shape was
+  known, it will be lost. (2) inception.slim.ops._two_element_tuple cannot
+  handle tensors that define the kernel size.
+      shape = tf.shape(input_tensor)
+      return = tf.stack([tf.minimum(shape[1], kernel_size[0]),
+                        tf.minimum(shape[2], kernel_size[1])])
+  """
+  shape = input_tensor.get_shape().as_list()
+  if shape[1] is None or shape[2] is None:
+    kernel_size_out = kernel_size
+  else:
+    kernel_size_out = [
+      min(shape[1], kernel_size[0]), min(shape[2], kernel_size[1])
+    ]
+  return kernel_size_out
+
+
 def inception_block(prev, t1x1=2, t3x3=2, t5x5=2, tmp=2, resize=None, norm=True, training=True, name='incep'):
   '''
 

@@ -16,6 +16,7 @@ def parse_args():
   flags.DEFINE_string('mode', 'train', 'Either train or predict')
   flags.DEFINE_float('learning_rate', 0.01, 'Learning rate')
   flags.DEFINE_float('dropout', 0.7, 'Dropout percentage')
+  flags.DEFINE_bool('spatial_squeeze', True, 'If True, logits is of shape [B, C], if false logits is of shape [B, 1, 1, C], where B is batch_size and C is number of classes.')
   flags.DEFINE_integer('num_classes', 1000, 'Number of classes to classify')
   flags.DEFINE_integer('batch_size', 16, 'Input function batch size')
   flags.DEFINE_integer('buffer_size', 64, 'Input function buffer size')
@@ -42,6 +43,7 @@ def run(model_fn):
     'model_dir': args.model_dir,
     'learning_rate': args.learning_rate,
     'dropout_rate': args.dropout,
+    'spatial_squeeze': args.spatial_squeeze,
     'num_classes': args.num_classes,
     'width': args.img_width,
     'height': args.img_height,
@@ -56,8 +58,10 @@ def run(model_fn):
     train_input_fn = gen_input(args.train_set.split(','),
                                batch_size=args.batch_size,
                                buffer_size=args.buffer_size,
+                               img_shape=[args.img_height, args.img_width, 3],
                                repeat=args.epochs)
-    eval_input_fn = gen_input(args.val_set.split(','))
+    eval_input_fn = gen_input(args.val_set.split(','),
+                              img_shape=[args.img_height, args.img_width, 3])
 
     tf.logging.info('Training for {}'.format(None if args.max_steps < 1 else args.max_steps))
     train_spec = tf.estimator.TrainSpec(input_fn=train_input_fn,
@@ -66,7 +70,7 @@ def run(model_fn):
 
     tf.estimator.train_and_evaluate(estimator, train_spec, eval_spec)
   elif args.mode == 'predict':
-    input_fn = gen_input(args.predict_set, batch_size=args.batch_size)
+    input_fn = gen_input(args.predict_set, batch_size=args.batch_size, img_shape=[args.img_height, args.img_width, 3])
 
     tf.logging.debug('Generating predictions using {}'.format(args.predict_set))
     predictions = estimator.predict(input_fn=input_fn)

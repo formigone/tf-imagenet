@@ -37,9 +37,9 @@ def parse_synset_mapping(path):
   synset_map = {}
   with open(path, 'r') as fp:
     lines = fp.readlines()
-    for line in lines:
+    for index, line in enumerate(lines):
       parts = line.split(' ')
-      synset_map[parts[0]] = [label.strip() for label in ' '.join(parts[1:]).split(',')]
+      synset_map[parts[0]] = [index] + [label.strip() for label in ' '.join(parts[1:]).split(',')]
     return synset_map
 
 

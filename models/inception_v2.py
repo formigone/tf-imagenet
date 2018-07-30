@@ -241,8 +241,7 @@ def model_fn(features, labels, mode, params):
   if mode == tf.estimator.ModeKeys.PREDICT:
     return tf.estimator.EstimatorSpec(mode=mode, predictions=predictions)
 
-  onehot_labels = tf.one_hot(indices=labels, depth=params['num_classes'], name='onehot_labels')
-  loss = tf.losses.softmax_cross_entropy(onehot_labels=onehot_labels, logits=logits)
+  loss = tf.losses.sparse_softmax_cross_entropy(logits=logits, labels=labels)
   tf.summary.scalar('loss', loss)
 
   eval_metric_ops = {

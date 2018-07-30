@@ -16,17 +16,16 @@ flags.DEFINE_boolean('training', True, 'Whether to look for files in the trainin
 
 FLAGS = flags.FLAGS
 
+synset_mapping = utils.parse_synset_mapping(FLAGS.synset_mapping)
 
 files = pd.read_csv(FLAGS.input_csv)
 files = utils.expand_prediction_cell(files, 'PredictionString')
 files = files.sample(frac=1)
 
-print('Finished parsing input CSV file. Generating TFRecords...')
-
 writer = tf.python_io.TFRecordWriter(FLAGS.output_tfrecord)
 i = 0
-synset_mapping = utils.parse_synset_mapping(FLAGS.synset_mapping)
-synset_to_int = utils.generate_synset_to_int_mapping(synset_mapping)
+
+print('Finished parsing input CSV file. Generating TFRecords...')
 
 for index, row in files.iterrows():
   # ImageId, Width, Height, lb0, [xmin0, ymin0, xmax0, ymax0]...
@@ -34,12 +33,12 @@ for index, row in files.iterrows():
   if i % 1000 == 0:
     print('{}/{}'.format(i, files.shape[0]))
 
+  labelId = row.lb0
+
   if FLAGS.training:
     imgId = row.ImageId
-    labelId = imgId.split('_')[0]
     path = 'data/train/{}/{}.JPEG'.format(labelId, imgId)
   else:
-    labelId = row.lb0
     path = 'data/val/{}.JPEG'.format(row.ImageId)
 
   img = cv2.imread(path)
@@ -49,7 +48,7 @@ for index, row in files.iterrows():
 
   feature = {
     'img': utils._bytes_feature(tf.compat.as_bytes(img.tostring())),
-    'class': utils._int64_feature(synset_to_int[labelId]),
+    'class': utils._int64_feature(synset_mapping[labelId][0]),
     # 'width': utils._int64_feature(row.Width),
     # 'height': utils._int64_feature(row.Height),
   }

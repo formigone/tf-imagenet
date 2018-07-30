@@ -228,7 +228,7 @@ def model_fn(features, labels, mode, params):
     net = layers_lib.avg_pool2d(net, kernel_size, stride=1, padding='VALID', scope='AvgPool_1a_{}x{}'.format(*kernel_size))
 
     # 1 x 1 x 1024
-    net = layers_lib.dropout(net, keep_prob=params['dropout_rate'], scope='Dropout_1b')
+    net = layers_lib.dropout(net, keep_prob=params['dropout_keep_prob'], scope='Dropout_1b')
     logits = layers.conv2d(net, params['num_classes'], [1, 1], activation_fn=None, normalizer_fn=None, scope='Conv2d_1c_1x1')
     if params['spatial_squeeze']:
       logits = array_ops.squeeze(logits, [1, 2], name='SpatialSqueeze')

@@ -3,6 +3,9 @@ from __future__ import division
 import tensorflow as tf
 import pandas as pd
 import itertools
+import time
+import os
+import matplotlib.pyplot as plt
 
 from data import gen_input
 
@@ -13,20 +16,20 @@ def parse_args():
   flags.DEFINE_string('val_set', '', 'TFRecord used for evaluation')
   flags.DEFINE_string('model_dir', '', 'Path to saved_model')
 
-  flags.DEFINE_string('mode', 'train', 'Either train or predict')
-  flags.DEFINE_float('learning_rate', 0.01, 'Learning rate')
-  flags.DEFINE_float('dropout', 0.7, 'Dropout percentage')
+  flags.DEFINE_string('mode', 'train', 'Either train or predict.')
+  flags.DEFINE_float('learning_rate', 0.01, 'Learning rate.')
+  flags.DEFINE_float('dropout_keep_prob', 0.7, 'The probability that each element is kept.')
   flags.DEFINE_bool('spatial_squeeze', True, 'If True, logits is of shape [B, C], if false logits is of shape [B, 1, 1, C], where B is batch_size and C is number of classes.')
-  flags.DEFINE_integer('num_classes', 1000, 'Number of classes to classify')
-  flags.DEFINE_integer('batch_size', 16, 'Input function batch size')
-  flags.DEFINE_integer('buffer_size', 64, 'Input function buffer size')
-  flags.DEFINE_integer('img_width', 299, 'Width of input image')
-  flags.DEFINE_integer('img_height', 299, 'Height of input image')
+  flags.DEFINE_integer('num_classes', 1000, 'Number of classes to classify.')
+  flags.DEFINE_integer('batch_size', 16, 'Input function batch size.')
+  flags.DEFINE_integer('buffer_size', 64, 'Input function buffer size.')
+  flags.DEFINE_integer('img_width', 299, 'Width of input image.')
+  flags.DEFINE_integer('img_height', 299, 'Height of input image.')
 
-  flags.DEFINE_string('predict_set', '', 'TFRecord used for prediction')
-  flags.DEFINE_string('predict_csv', '', 'Name of test file')
-  flags.DEFINE_integer('max_steps', 10000, 'How many steps to take during training - including current step')
-  flags.DEFINE_integer('epochs', 1, 'How many epochs before the input_fn throws OutOfRange exception')
+  flags.DEFINE_string('predict_set', '', 'TFRecord used for prediction.')
+  flags.DEFINE_string('predict_csv', '', 'Name of test file.')
+  flags.DEFINE_integer('max_steps', 10000, 'How many steps to take during training - including current step.')
+  flags.DEFINE_integer('epochs', 1, 'How many epochs before the input_fn throws OutOfRange exception.')
 
   args = flags.FLAGS
   args._parse_flags()
@@ -42,7 +45,7 @@ def run(model_fn):
     'val_set': args.val_set,
     'model_dir': args.model_dir,
     'learning_rate': args.learning_rate,
-    'dropout_rate': args.dropout,
+    'dropout_keep_prob': args.dropout_keep_prob,
     'spatial_squeeze': args.spatial_squeeze,
     'num_classes': args.num_classes,
     'width': args.img_width,
@@ -118,5 +121,12 @@ def run(model_fn):
       tf.logging.debug('Accuracy {}/{} ({}%)'.format(correct, correct + wrong, correct / (correct + wrong) * 100))
       tf.logging.debug('Min/max {}/{}'.format(min, max))
       tf.logging.debug('MSE {}'.format(mse / (correct + wrong)))
+  elif args.mode == 'weights':
+    weights = estimator.get_variable_value('Conv2d_1a_7x7/weights')
+    path = 'weights-vis/{}'.format(int(time.time()))
+    os.makedirs(path)
+
+    for index in range(64):
+      plt.imsave('{}/weights-{}.png'.format(path, index), weights[:, :, :, index])
   else:
     raise ValueError('Invalid mode')

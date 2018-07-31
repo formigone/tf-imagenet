@@ -2,6 +2,7 @@ from __future__ import division
 
 import tensorflow as tf
 import pandas as pd
+import numpy as np
 import itertools
 import time
 import os
@@ -127,6 +128,8 @@ def run(model_fn):
     os.makedirs(path)
 
     for index in range(64):
-      plt.imsave('{}/weights-{}.png'.format(path, index), weights[:, :, :, index])
+      w = np.array(weights[:,:,:,index])
+      w = ( (w - w.min()) * ( 1/ (w.max() - w.min()) * 255)).astype('uint8')
+      plt.imsave('{}/weights-{}.png'.format(path, index), w)
   else:
     raise ValueError('Invalid mode')

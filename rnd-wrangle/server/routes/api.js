@@ -1,4 +1,5 @@
 const express = require('express');
+const fs = require('fs');
 
 const samples = require('../services/samples');
 
@@ -39,6 +40,16 @@ router.get('/synset', async(req, res) => {
 router.get('/synset/:id', async(req, res) => {
   const synset = await samples.getSynset(req.params.id);
   res.json({ synset });
+});
+
+router.get('/ls/:path', (req, res) => {
+  fs.readdir(`${__dirname}/../../../${decodeURIComponent(req.params.path)}`, (err, out) => {
+    if (err) {
+      return res.json({ error: err.message });
+    }
+
+    res.json({ out });
+  });
 });
 
 module.exports = router;

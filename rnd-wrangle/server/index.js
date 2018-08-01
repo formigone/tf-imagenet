@@ -8,11 +8,16 @@ app.use(bodyParser.json());
 app.use('/public', express.static(`${__dirname}/../public`));
 app.use('/img', express.static(`${__dirname}/../../data`));
 
+app.use('/api', require('./routes/api'));
+
+app.get('/conv', (req, res) => {
+  res.sendFile(`${__dirname}/views/conv.html`);
+});
+
 app.get('/', (req, res) => {
   res.sendFile(`${__dirname}/views/index.html`);
 });
 
-app.use('/api', require('./routes/api'));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

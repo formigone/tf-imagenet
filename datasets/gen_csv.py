@@ -24,7 +24,7 @@ files = files.sample(frac=1)
 
 i = 0
 
-print('Finished parsing input CSV file. Generating TFRecords...')
+print('Finished parsing input CSV file. Generating CSVs...')
 
 for index, row in files.iterrows():
   # ImageId, Width, Height, lb0, [xmin0, ymin0, xmax0, ymax0]...
@@ -50,8 +50,6 @@ for index, row in files.iterrows():
   df_data.append(feature)
 
   i += 1
-  if i > 10:
-    break
 
 df = pd.DataFrame(df_data, columns=['img', 'class'])
 df.to_csv(FLAGS.output_csv, index=False)

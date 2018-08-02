@@ -3,7 +3,7 @@ from __future__ import division
 import tensorflow as tf
 
 
-def gen_input(filename, batch_size=16, repeat=1, buffer_size=1, img_shape=(128, 128, 3)):
+def gen_input(filename, batch_size=16, repeat=1, buffer_size=1, img_shape=(128, 128, 3), augment=False):
   tf.logging.debug('input_fn: {}'.format({
     'batch_size': batch_size,
     'repeat': repeat,
@@ -33,12 +33,13 @@ def gen_input(filename, batch_size=16, repeat=1, buffer_size=1, img_shape=(128, 
     feature = tf.image.decode_jpeg(value, channels=3)
     feature = tf.image.resize_images(feature, [img_shape[1], img_shape[0]]) / 255
 
-    feature = tf.image.random_brightness(feature, max_delta=32. / 255.)
-    feature = tf.image.random_saturation(feature, lower=0.5, upper=1.5)
-    feature = tf.image.random_hue(feature, max_delta=0.2)
-    feature = tf.image.random_contrast(feature, lower=0.5, upper=1.5)
-    feature = tf.image.random_flip_left_right(feature)
-    feature = tf.image.random_flip_up_down(feature)
+    if augment:
+      feature = tf.image.random_brightness(feature, max_delta=32. / 255.)
+      feature = tf.image.random_saturation(feature, lower=0.5, upper=1.5)
+      feature = tf.image.random_hue(feature, max_delta=0.2)
+      feature = tf.image.random_contrast(feature, lower=0.5, upper=1.5)
+      feature = tf.image.random_flip_left_right(feature)
+      feature = tf.image.random_flip_up_down(feature)
 
     label = tf.cast(parsed[-1], dtype=tf.int64)
 

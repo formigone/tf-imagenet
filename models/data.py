@@ -21,10 +21,40 @@ def gen_input(filename, batch_size=16, repeat=1, buffer_size=1, img_shape=(128, 
     img = tf.decode_raw(parsed['img'], tf.float32)
     img = tf.reshape(img, img_shape)
 
-    return img / 256, parsed['class']
+    # [<tf.Tensor 'Reshape:0' shape=(224, 224, 3) dtype=float32>, <tf.Tensor 'ParseSingleExample/Squeeze_class:0' shape=() dtype=int64>]
+    # print([img, parsed['class']])
+
+    return img / 255, parsed['class']
+
+  def decode_csv(line):
+    parsed = tf.decode_csv(line, record_defaults=[['r'],[0]])
+    path = parsed[0]
+    value = tf.read_file(path)
+    feature = tf.image.decode_jpeg(value, channels=3)
+    feature = tf.image.resize_images(feature, [img_shape[1], img_shape[0]]) / 255
+
+    feature = tf.image.random_brightness(feature, max_delta=32. / 255.)
+    feature = tf.image.random_saturation(feature, lower=0.5, upper=1.5)
+    feature = tf.image.random_hue(feature, max_delta=0.2)
+    feature = tf.image.random_contrast(feature, lower=0.5, upper=1.5)
+    feature = tf.image.random_flip_left_right(feature)
+    feature = tf.image.random_flip_up_down(feature)
+
+    label = tf.cast(parsed[-1], dtype=tf.int64)
+
+    # [<tf.Tensor 'truediv:0' shape=(224, 224, 3) dtype=float32>, <tf.Tensor 'Cast:0' shape=() dtype=int64>]
+    # print([feature, label])
+
+    return feature, label
 
   def input_fn():
-    dataset = (tf.data.TFRecordDataset(filename)).map(decode)
+    if filename[0].endswith('.csv'):
+      dataset = tf.data.TextLineDataset(filename).skip(1).map(decode_csv)
+      # <MapDataset shapes: ((224, 224, 3), ()), types: (tf.float32, tf.int64)>
+    else:
+      dataset = (tf.data.TFRecordDataset(filename)).map(decode)
+      # <MapDataset shapes: ((224, 224, 3), ()), types: (tf.float32, tf.int64)>
+
     if buffer_size > 1:
       dataset = dataset.shuffle(buffer_size=buffer_size)
     dataset = dataset.repeat(repeat)

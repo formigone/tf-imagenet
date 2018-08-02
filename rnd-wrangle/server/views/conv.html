@@ -16,6 +16,10 @@
       clear: both;
     }
 
+    .grid input {
+      display: block;
+    }
+
     .grid img {
       width: calc(100% / 8);
       image-rendering: pixelated;
@@ -47,17 +51,29 @@
     return await res.json();
   }
 
-  function render(col, index, id, timeout = 500) {
-    setTimeout(() => {
-      render(col, (index + 1) % col.length, id, timeout);
-    }, timeout);
-
+  function render(col, index, id) {
     let grid = document.querySelector(`#${id}`);
+    let title = document.querySelector(`#${id}-title`);
 
     if (!grid) {
       grid = document.createElement('div');
       grid.setAttribute('id', id);
       grid.setAttribute('class', 'grid');
+
+      title = document.createElement('h1');
+      title.setAttribute('id', `${id}-title`);
+      grid.appendChild(title);
+
+      const slider = document.createElement('input');
+      slider.setAttribute('type', 'range');
+      slider.setAttribute('min', '0');
+      slider.setAttribute('max', String(col.length - 1));
+      slider.setAttribute('value', index);
+      grid.appendChild(slider);
+
+      slider.addEventListener('input', (e) => {
+        render(col, Number(e.target.value), id);
+      });
 
       for (let i = 0; i < col.length; i++) {
         const cell = document.createElement('img');
@@ -67,6 +83,7 @@
       document.body.appendChild(grid);
     }
 
+    title.textContent = `${index + 1}/${col.length}`;
     for (let i = 0; i < col[index].length; i++) {
       if (col[index][i] && grid.children[i]) {
         grid.children[i].setAttribute('src', col[index][i]);

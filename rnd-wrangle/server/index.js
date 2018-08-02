@@ -7,6 +7,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use('/public', express.static(`${__dirname}/../public`));
 app.use('/img', express.static(`${__dirname}/../../data`));
+app.use('/weights-vis', express.static(`${__dirname}/../../weights-vis`));
+app.use('/feature-maps', express.static(`${__dirname}/../../feature-maps`));
 
 app.use('/api', require('./routes/api'));
 

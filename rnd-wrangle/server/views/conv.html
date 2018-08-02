@@ -36,7 +36,7 @@
 
     const files = await Promise.all(dirs.filter((dir) => !(dir[0] === '.')).map(async(dir) => {
       const res = await getDirs(`${weightsPath}/${dir}`);
-      return res.out.filter((file) => !(file[0] === '.')).map((file) => `http://localhost:3001/${weightsPath}/${dir}/${file}`);
+      return res.out.filter((file) => !(file[0] === '.')).map((file) => `/${weightsPath}/${dir}/${file}`);
     }));
     
     render(files, 0, weightsPath);
@@ -47,7 +47,7 @@
     return await res.json();
   }
 
-  function render(col, index, id, timeout = 100) {
+  function render(col, index, id, timeout = 500) {
     setTimeout(() => {
       render(col, (index + 1) % col.length, id, timeout);
     }, timeout);

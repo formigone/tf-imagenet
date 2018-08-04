@@ -34,12 +34,14 @@ def parse_synset_mapping(path):
   Example:
       n01484850 great white shark, white shark, man-eater, man-eating shark, Carcharodon carcharias
   """
-  synset_map = {}
+  synset_map = {
+    'dummy_placeholder_value': [0]
+  }
   with open(path, 'r') as fp:
     lines = fp.readlines()
     for index, line in enumerate(lines):
       parts = line.split(' ')
-      synset_map[parts[0]] = [index] + [label.strip() for label in ' '.join(parts[1:]).split(',')]
+      synset_map[parts[0]] = [index + 1] + [label.strip() for label in ' '.join(parts[1:]).split(',')]
     return synset_map
 
 

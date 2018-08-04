@@ -34,10 +34,7 @@ def gen_input(filename, batch_size=16, repeat=1, buffer_size=1, img_shape=(128, 
     feature = tf.image.resize_images(feature, [img_shape[1], img_shape[0]]) / 255
 
     if augment:
-      feature = tf.image.random_brightness(feature, max_delta=32. / 255.)
-      feature = tf.image.random_saturation(feature, lower=0.5, upper=1.5)
-      feature = tf.image.random_hue(feature, max_delta=0.2)
-      feature = tf.image.random_contrast(feature, lower=0.5, upper=1.5)
+      feature = tf.image.random_hue(feature, max_delta=0.05)
       feature = tf.image.random_flip_left_right(feature)
       feature = tf.image.random_flip_up_down(feature)
 

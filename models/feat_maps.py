@@ -42,7 +42,7 @@ with tf.Session() as sess:
   features = sess.run(conv2d_bias, feed_dict={conv2d: features, b: biases})
   features = sess.run(tf.nn.relu(features))
 
-  path = '../feature-maps/{}'.format(int(time.time()))
+  path = '../feature-maps-bn/{}'.format(int(time.time()))
   os.makedirs(path)
 
   for index in range(64):

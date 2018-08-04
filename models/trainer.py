@@ -126,7 +126,7 @@ def run(model_fn):
       tf.logging.debug('MSE {}'.format(mse / (correct + wrong)))
   elif args.mode == 'weights':
     weights = estimator.get_variable_value('Conv2d_1a_7x7/weights')
-    path = 'weights-vis/{}'.format(int(time.time()))
+    path = 'weights-vis-bn/{}'.format(int(time.time()))
     os.makedirs(path)
 
     for index in range(64):

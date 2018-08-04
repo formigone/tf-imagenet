@@ -19,6 +19,18 @@ app.use('/feature-maps', express.static(`${__dirname}/../../feature-maps`, {
   },
 }));
 
+app.use('/weights-vis-bn', express.static(`${__dirname}/../../weights-vis-bn`, {
+  setHeaders: (res, path) => {
+    console.log('req ' + path);
+    res.set('Cache-Control', 'public max-age=31557600');
+  },
+}));
+app.use('/feature-maps-bn', express.static(`${__dirname}/../../feature-maps-bn`, {
+  setHeaders: (res, path) => {
+    res.set('Cache-Control', 'public max-age=31557600');
+  },
+}));
+
 app.use('/api', require('./routes/api'));
 
 app.get('/conv', (req, res) => {

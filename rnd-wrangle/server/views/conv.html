@@ -11,7 +11,7 @@
     }
 
     .grid {
-      width: 70%;
+      width: 50%;
       margin: 3em auto;
       clear: both;
     }
@@ -75,7 +75,7 @@
         render(col, Number(e.target.value), id);
       });
 
-      for (let i = 0; i < col.length; i++) {
+      for (let i = 0; i < 64/*col.length*/; i++) {
         const cell = document.createElement('img');
         grid.appendChild(cell);
       }

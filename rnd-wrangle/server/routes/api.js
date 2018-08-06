@@ -52,4 +52,58 @@ router.get('/ls/:path', (req, res) => {
   });
 });
 
+router.get('/valset', (req, res) => {
+  fs.readFile(`${__dirname}/../../../LOC_val_solution.csv`, 'utf8', (err, out) => {
+    if (err) {
+      return res.json({ error: err.message });
+    }
+
+    const valset = {};
+    out.split('\n').forEach((line, index) => {
+      if (index === 0 || !line) {
+        return;
+      }
+
+      const parts = line.split(',');
+      const synset = parts[1].split(' ')[0];
+      valset[synset] = valset[synset] || {
+          label: samples.getSynsetSync(synset),
+          images: [],
+        };
+
+      valset[synset].images.push(`${parts[0]}.JPEG`);
+    });
+
+    res.json(valset);
+  });
+});
+
+router.get('/trainset', (req, res) => {
+  fs.readFile(`${__dirname}/../../../LOC_train_solution.csv`, 'utf8', (err, out) => {
+    if (err) {
+      return res.json({ error: err.message });
+    }
+
+    const valset = {};
+    out.split('\n').forEach((line, index) => {
+      if (index === 0 || !line) {
+        return;
+      }
+
+      const parts = line.split(',');
+      const synset = parts[1].split(' ')[0];
+      valset[synset] = valset[synset] || {
+          label: samples.getSynsetSync(synset),
+          images: [],
+        };
+
+      // if (valset[synset].images.length < 10) {
+        valset[synset].images.push(`${synset}/${parts[0]}.JPEG`);
+      // }
+    });
+
+    res.json(valset);
+  });
+});
+
 module.exports = router;

@@ -67,6 +67,8 @@ def run(model_fn):
                                augment=args.augment,
                                repeat=args.epochs)
     eval_input_fn = gen_input(args.val_set.split(','),
+                              batch_size=args.batch_size,
+                              buffer_size=args.buffer_size,
                               img_shape=[args.img_height, args.img_width, 3])
 
     tf.logging.info('Training for {}'.format(None if args.max_steps < 1 else args.max_steps))

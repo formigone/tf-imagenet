@@ -1,0 +1,91 @@
+<!doctype html>
+<html>
+<head>
+  <title>Data Science R&D</title>
+  <style>
+    html, body {
+      width: 100%;
+      height: 100%;
+      padding: 0;
+      margin: 0;
+    }
+
+    .grid {
+      width: 100%;
+      margin: 3em auto;
+      clear: both;
+      overflow: hidden;
+    }
+
+    .grid input {
+      display: block;
+    }
+
+    .grid img {
+      width: calc(100% / 8);
+      image-rendering: pixelated;
+      display: block;
+      margin: 0;
+      padding: 0;
+      float: left;
+      border: 3px solid #fff;
+      box-sizing: border-box;
+    }
+
+    .closed {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+<script>
+  async function main() {
+    const valset = await getTrainset();
+
+    for (let key in valset) {
+      const title = document.createElement('h1');
+      title.textContent = `${valset[key].label.join(' | ')} (${valset[key].images.length})`;
+      document.body.appendChild(title);
+
+      const cell = document.createElement('div');
+      cell.classList.add('closed');
+      cell.classList.add('grid');
+
+      document.body.appendChild(cell);
+
+      title.addEventListener('click', () => {
+        cell.classList.toggle('closed');
+        if (!cell.classList.contains('closed')) {
+          if (cell.children.length === 0) {
+            valset[key].images.forEach((path, i) => {
+              if (i > 32) {
+                return;
+              }
+              const img = document.createElement('img');
+              img.setAttribute('data-src', path);
+              cell.appendChild(img);
+            });
+          }
+          Array.from(cell.children).forEach((img) => {
+            if (!img.getAttribute('src')) {
+              img.addEventListener('load', () => {
+                img.style.height = `${img.clientWidth}px`;
+              });
+              img.setAttribute('src', `/data/train/${img.getAttribute('data-src')}`);
+            }
+          });
+        }
+      });
+    }
+  }
+
+  async function getTrainset() {
+    const res = await fetch(`/api/trainset`);
+    return await res.json();
+  }
+
+  main();
+</script>
+</body>
+</html>

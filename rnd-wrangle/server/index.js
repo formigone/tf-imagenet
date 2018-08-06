@@ -7,34 +7,30 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use('/public', express.static(`${__dirname}/../public`));
 app.use('/img', express.static(`${__dirname}/../../data`));
-app.use('/weights-vis', express.static(`${__dirname}/../../weights-vis`, {
-  setHeaders: (res, path) => {
-    console.log('req ' + path);
-    res.set('Cache-Control', 'public max-age=31557600');
-  },
-}));
-app.use('/feature-maps', express.static(`${__dirname}/../../feature-maps`, {
-  setHeaders: (res, path) => {
-    res.set('Cache-Control', 'public max-age=31557600');
-  },
-}));
 
-app.use('/weights-vis-bn', express.static(`${__dirname}/../../weights-vis-bn`, {
-  setHeaders: (res, path) => {
-    console.log('req ' + path);
-    res.set('Cache-Control', 'public max-age=31557600');
-  },
-}));
-app.use('/feature-maps-bn', express.static(`${__dirname}/../../feature-maps-bn`, {
-  setHeaders: (res, path) => {
-    res.set('Cache-Control', 'public max-age=31557600');
-  },
-}));
+const staticDirs = ['/weights-vis', '/feature-maps', '/weights-vis-bn', '/feature-maps-bn', '/data'];
+
+staticDirs.forEach((path) => {
+  app.use(path, express.static(`${__dirname}/../../${path}`, {
+    setHeaders: (res, path) => {
+      console.log('req ' + path);
+      res.set('Cache-Control', 'public max-age=31557600');
+    },
+  }));
+});
 
 app.use('/api', require('./routes/api'));
 
 app.get('/conv', (req, res) => {
   res.sendFile(`${__dirname}/views/conv.html`);
+});
+
+app.get('/val', (req, res) => {
+  res.sendFile(`${__dirname}/views/val.html`);
+});
+
+app.get('/train', (req, res) => {
+  res.sendFile(`${__dirname}/views/train.html`);
 });
 
 app.get('/', (req, res) => {

@@ -136,6 +136,9 @@ const samples = {
       resolve(synset[id] || ['N/A']);
     });
   },
+  getSynsetSync(id) {
+    return synset[id] || ['N/A'];
+  },
   synset() {
     return Promise.resolve(synset);
   },

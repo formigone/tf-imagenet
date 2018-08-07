@@ -45,6 +45,30 @@ def parse_synset_mapping(path):
     return synset_map
 
 
+def parse_synset_mapping_with(path, classes):
+  """Parse the synset mapping file into a dictionary mapping <synset_id>:[<synonyms in English>]
+  This assumes an input file formatted as:
+      <synset_id> <category>, <synonym...>
+  Example:
+      n01484850 great white shark, white shark, man-eater, man-eating shark, Carcharodon carcharias
+  """
+  synset_map = {}
+  with open(path, 'r') as fp:
+    index = 0
+    lines = fp.readlines()
+    for line in lines:
+      parts = line.split(' ')
+      labels = ' '.join(parts[1:]).split(',')
+      try:
+        if len(classes) > 0:
+          classes.index(labels[0])
+        synset_map[parts[0]] = [index] + [label.strip() for label in labels]
+        index += 1
+      except ValueError:
+        pass
+    return synset_map
+
+
 def generate_synset_to_int_mapping(synset_mapping):
   synset_to_int_map = {}
   for index, (key, val) in enumerate(synset_mapping.items()):

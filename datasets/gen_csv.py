@@ -10,13 +10,19 @@ flags.DEFINE_string('synset_mapping', '', 'Path to synset mapping file')
 flags.DEFINE_integer('width', 299, 'New image width after resize')
 flags.DEFINE_integer('height', 299, 'New image height after resize')
 flags.DEFINE_boolean('training', True, 'Whether to look for files in the training set directory or not')
+flags.DEFINE_string('use_only_from_classes', '', 'Optional. When a comma-separated list of synset values is passes, a synset map will be created of only those values.')
 
 FLAGS = flags.FLAGS
 
 df_data = []
 
 print('Parsing synset mapping...')
-synset_mapping = utils.parse_synset_mapping(FLAGS.synset_mapping)
+classes = filter(None, [className.strip() for className in FLAGS.use_only_from_classes.split(',')])
+
+if len(classes) > 0:
+  print('Restricting synset to only: {}'.format(classes))
+
+synset_mapping = utils.parse_synset_mapping_with(FLAGS.synset_mapping, classes)
 
 files = pd.read_csv(FLAGS.input_csv)
 files = utils.expand_prediction_cell(files, 'PredictionString')
@@ -26,13 +32,18 @@ i = 0
 
 print('Finished parsing input CSV file. Generating CSVs...')
 
+report_every = 1000 if len(classes) == 0 else 50
+
 for index, row in files.iterrows():
   # ImageId, Width, Height, lb0, [xmin0, ymin0, xmax0, ymax0]...
 
-  if i % 1000 == 0:
+  if i % report_every == 0:
     print('{}/{}'.format(i, files.shape[0]))
 
   labelId = row.lb0
+
+  if len(classes) > 0 and labelId not in synset_mapping:
+    continue
 
   if FLAGS.training:
     imgId = row.ImageId

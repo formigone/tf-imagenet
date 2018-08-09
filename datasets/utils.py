@@ -59,9 +59,10 @@ def parse_synset_mapping_with(path, classes):
     for line in lines:
       parts = line.split(' ')
       labels = ' '.join(parts[1:]).split(',')
+      label = labels[0].strip()
       try:
         if len(classes) > 0:
-          classes.index(labels[0])
+          classes.index(label)
         synset_map[parts[0]] = [index] + [label.strip() for label in labels]
         index += 1
       except ValueError:

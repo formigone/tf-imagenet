@@ -20,7 +20,7 @@ print('Parsing synset mapping...')
 classes = filter(None, [className.strip() for className in FLAGS.use_only_from_classes.split(',')])
 
 if len(classes) > 0:
-  print('Restricting synset to only: {}'.format(classes))
+  print('Restricting synset to only {} classes: {}'.format(len(classes), classes))
 
 synset_mapping = utils.parse_synset_mapping_with(FLAGS.synset_mapping, classes)
 
@@ -32,7 +32,7 @@ i = 0
 
 print('Finished parsing input CSV file. Generating CSVs...')
 
-report_every = 1000 if len(classes) == 0 else 50
+report_every = 1000 if len(classes) == 0 else 500
 
 for index, row in files.iterrows():
   # ImageId, Width, Height, lb0, [xmin0, ymin0, xmax0, ymax0]...

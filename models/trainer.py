@@ -20,6 +20,7 @@ def parse_args():
   flags.DEFINE_string('mode', 'train', 'Either train or predict.')
   flags.DEFINE_float('learning_rate', 0.01, 'Learning rate.')
   flags.DEFINE_float('dropout_keep_prob', 0.5, 'The probability that each element is kept.')
+  flags.DEFINE_bool('norm_2', False, 'When set, input is normalized with (W / 255 + 0.5) instead of (W / 255).')
   flags.DEFINE_bool('spatial_squeeze', True, 'If True, logits is of shape [B, C], if false logits is of shape [B, 1, 1, C], where B is batch_size and C is number of classes.')
   flags.DEFINE_bool('augment', True, 'Whether the training data should be augmented with random flips and other visual adjustments.')
   flags.DEFINE_integer('num_classes', 1000, 'Number of classes to classify.')
@@ -65,10 +66,12 @@ def run(model_fn):
                                buffer_size=args.buffer_size,
                                img_shape=[args.img_height, args.img_width, 3],
                                augment=args.augment,
+                               norm_2=args.norm_2,
                                repeat=args.epochs)
     eval_input_fn = gen_input(args.val_set.split(','),
                               batch_size=args.batch_size,
                               buffer_size=args.buffer_size,
+                              norm_2=args.norm_2,
                               img_shape=[args.img_height, args.img_width, 3])
 
     tf.logging.info('Training for {}'.format(None if args.max_steps < 1 else args.max_steps))

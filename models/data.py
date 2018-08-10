@@ -3,7 +3,7 @@ from __future__ import division
 import tensorflow as tf
 
 
-def gen_input(filename, batch_size=16, repeat=1, buffer_size=1, img_shape=(128, 128, 3), augment=False):
+def gen_input(filename, batch_size=16, repeat=1, buffer_size=1, img_shape=(128, 128, 3), augment=False, norm_2=False):
   tf.logging.debug('input_fn: {}'.format({
     'batch_size': batch_size,
     'repeat': repeat,
@@ -31,7 +31,8 @@ def gen_input(filename, batch_size=16, repeat=1, buffer_size=1, img_shape=(128, 
     path = parsed[0]
     value = tf.read_file(path)
     feature = tf.image.decode_jpeg(value, channels=3)
-    feature = tf.image.resize_images(feature, [img_shape[1], img_shape[0]]) / 255
+    val = 0.5 if norm_2 else 0
+    feature = tf.image.resize_images(feature, [img_shape[1], img_shape[0]]) / 255 + val
 
     if augment:
       feature = tf.image.random_hue(feature, max_delta=0.05)

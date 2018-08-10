@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import tensorflow as tf
 
-import inception_v2
+import inception_v2_bn2 as inception
 
 flags = tf.app.flags
 flags.DEFINE_string('model_dir', '', 'Path to saved_model')
@@ -16,7 +16,7 @@ flags.DEFINE_integer('height', 224, 'New image height after resize')
 args = flags.FLAGS
 args._parse_flags()
 
-estimator = tf.estimator.Estimator(model_dir=args.model_dir, model_fn=inception_v2.model_fn, params={})
+estimator = tf.estimator.Estimator(model_dir=args.model_dir, model_fn=inception.model_fn, params={})
 
 # [7, 7, 3, 64]
 weights = estimator.get_variable_value('Conv2d_1a_7x7/weights')

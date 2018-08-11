@@ -29,6 +29,11 @@ def parse_args():
   flags.DEFINE_integer('img_width', 299, 'Width of input image.')
   flags.DEFINE_integer('img_height', 299, 'Height of input image.')
 
+  # map_first=False, num_parallel_calls=None, prefetch=0
+  flags.DEFINE_bool('map_first', False, 'If input pipeline should perform map before shuffle and repeat')
+  flags.DEFINE_integer('num_parallel_calls', None, 'Input pipeline optimization')
+  flags.DEFINE_integer('prefetch', 0, 'Input pipeline optimization')
+
   flags.DEFINE_string('predict_set', '', 'TFRecord used for prediction.')
   flags.DEFINE_string('predict_csv', '', 'Name of test file.')
   flags.DEFINE_integer('max_steps', 10000, 'How many steps to take during training - including current step.')
@@ -67,6 +72,9 @@ def run(model_fn):
                                img_shape=[args.img_height, args.img_width, 3],
                                augment=args.augment,
                                norm_2=args.norm_2,
+                               map_first=args.map_first,
+                               num_parallel_calls=args.num_parallel_calls,
+                               prefetch=args.prefetch,
                                repeat=args.epochs)
     eval_input_fn = gen_input(args.val_set.split(','),
                               batch_size=args.batch_size,
@@ -75,8 +83,7 @@ def run(model_fn):
                               img_shape=[args.img_height, args.img_width, 3])
 
     tf.logging.info('Training for {}'.format(None if args.max_steps < 1 else args.max_steps))
-    train_spec = tf.estimator.TrainSpec(input_fn=train_input_fn,
-                                        max_steps=None if args.max_steps < 1 else args.max_steps)
+    train_spec = tf.estimator.TrainSpec(input_fn=train_input_fn, max_steps=None if args.max_steps < 1 else args.max_steps)
     eval_spec = tf.estimator.EvalSpec(input_fn=eval_input_fn, steps=None)
 
     tf.estimator.train_and_evaluate(estimator, train_spec, eval_spec)

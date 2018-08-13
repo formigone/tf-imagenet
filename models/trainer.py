@@ -33,6 +33,7 @@ def parse_args():
   flags.DEFINE_bool('map_first', False, 'If input pipeline should perform map before shuffle and repeat')
   flags.DEFINE_integer('num_parallel_calls', None, 'Input pipeline optimization')
   flags.DEFINE_integer('prefetch', 0, 'Input pipeline optimization')
+  flags.DEFINE_integer('throttle_secs', 900, 'Do not re-evaluate unless the last evaluation was started at least this many seconds ago.')
 
   flags.DEFINE_string('predict_set', '', 'TFRecord used for prediction.')
   flags.DEFINE_string('predict_csv', '', 'Name of test file.')
@@ -84,7 +85,7 @@ def run(model_fn):
 
     tf.logging.info('Training for {}'.format(None if args.max_steps < 1 else args.max_steps))
     train_spec = tf.estimator.TrainSpec(input_fn=train_input_fn, max_steps=None if args.max_steps < 1 else args.max_steps)
-    eval_spec = tf.estimator.EvalSpec(input_fn=eval_input_fn, steps=None)
+    eval_spec = tf.estimator.EvalSpec(input_fn=eval_input_fn, steps=None, throttle_secs=args.throttle_secs)
 
     tf.estimator.train_and_evaluate(estimator, train_spec, eval_spec)
   elif args.mode == 'predict':

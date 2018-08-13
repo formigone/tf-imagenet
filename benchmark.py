@@ -1,4 +1,5 @@
 import subprocess
+import tensorflow as tf
 
 
 def get_cmd(buffer, batch, map_first, num_parallel_calls, prefetch):
@@ -29,12 +30,14 @@ num_parallel_calls = [0, 2, 4, 8]
 prefetch = [0, 1, 2, 4]
 map_first = [0, 1]
 
+tf.logging.set_verbosity(tf.logging.DEBUG)
+
 for m in map_first:
         for buf in buffer:
                 for bch in batch:
                         for thds in num_parallel_calls:
                                 for pfet in prefetch:
-                                        print('* * * * * * *')
-                                        print('map {} buf {} bch {} thds {} pfet {}'.format(m, buf, bch, thds, pfet))
+                                        tf.logging.debug('* * * * * * *')
+                                        tf.logging.debug('map {} buf {} bch {} thds {} pfet {}'.format(m, buf, bch, thds, pfet))
                                         cmd = get_cmd(buf, bch, m, thds, pfet)
                                         subprocess.call(cmd)

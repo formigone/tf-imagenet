@@ -60,7 +60,7 @@ def gen_input(filename, batch_size=16, repeat=1, buffer_size=1, img_shape=(128, 
       # <MapDataset shapes: ((224, 224, 3), ()), types: (tf.float32, tf.int64)>
 
     if map_first:
-      dataset = dataset.map(decode_cb, num_parallel_calls=num_parallel_calls)
+      dataset = dataset.map(decode_cb, num_parallel_calls=None if num_parallel_calls == 0 else num_parallel_calls)
       if buffer_size > 1:
         dataset = dataset.shuffle(buffer_size=buffer_size)
       dataset = dataset.repeat(repeat)
@@ -69,7 +69,7 @@ def gen_input(filename, batch_size=16, repeat=1, buffer_size=1, img_shape=(128, 
       if buffer_size > 1:
         dataset = dataset.shuffle(buffer_size=buffer_size)
       dataset = dataset.repeat(repeat)
-      dataset = dataset.map(decode_cb, num_parallel_calls=num_parallel_calls)
+      dataset = dataset.map(decode_cb, num_parallel_calls=None if num_parallel_calls == 0 else num_parallel_calls)
       dataset = dataset.batch(batch_size)
 
     if prefetch > 0:

@@ -30,7 +30,7 @@ def gen_input(filename, batch_size=16, repeat=1, buffer_size=1, img_shape=(128, 
     return img / 255, parsed['class']
 
   def decode_csv(line):
-    parsed = tf.decode_csv(line, record_defaults=[['r'], [0]])
+    parsed = tf.decode_csv(line, record_defaults=[['r'], [0], [0]])
     path = parsed[0]
     value = tf.read_file(path)
     feature = tf.image.decode_jpeg(value, channels=3)
@@ -42,12 +42,13 @@ def gen_input(filename, batch_size=16, repeat=1, buffer_size=1, img_shape=(128, 
       feature = tf.image.random_flip_left_right(feature)
       feature = tf.image.random_flip_up_down(feature)
 
-    label = tf.cast(parsed[-1], dtype=tf.int64)
+    label = tf.cast(parsed[1], dtype=tf.int64)
 
     # [<tf.Tensor 'truediv:0' shape=(224, 224, 3) dtype=float32>, <tf.Tensor 'Cast:0' shape=() dtype=int64>]
     # print([feature, label])
 
-    return feature, label
+    return {'img': feature, 'index': parsed[-1]}, label
+    # return feature, label
 
   def input_fn():
     if filename[0].endswith('.csv'):
@@ -77,6 +78,9 @@ def gen_input(filename, batch_size=16, repeat=1, buffer_size=1, img_shape=(128, 
 
     iterator = dataset.make_one_shot_iterator()
     features, labels = iterator.get_next()
+    print('-----------')
+    print(features)
+    print('-----------')
     return features, labels
 
   return input_fn

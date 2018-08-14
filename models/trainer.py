@@ -17,6 +17,8 @@ def parse_args():
   flags.DEFINE_string('val_set', '', 'TFRecord used for evaluation')
   flags.DEFINE_string('model_dir', '', 'Path to saved_model')
 
+  flags.DEFINE_string('cluster_spec', '', 'Distributed training stuff')
+
   flags.DEFINE_string('mode', 'train', 'Either train or predict.')
   flags.DEFINE_float('learning_rate', 0.01, 'Learning rate.')
   flags.DEFINE_float('dropout_keep_prob', 0.5, 'The probability that each element is kept.')
@@ -63,6 +65,9 @@ def run(model_fn):
 
   tf.logging.debug('Args: {}'.format(args.__flags))
   tf.logging.debug('Model Params: {}'.format(model_params))
+
+  if args.cluster_spec:
+    os.environ['TF_CONFIG'] = args.cluster_spec
 
   estimator = tf.estimator.Estimator(model_dir=args.model_dir, model_fn=model_fn, params=model_params)
 

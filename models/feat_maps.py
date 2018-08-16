@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import tensorflow as tf
 
-import inception_v2_bn2 as inception
+import inception_v2_bn_adam as inception
 
 flags = tf.app.flags
 flags.DEFINE_string('model_dir', '', 'Path to saved_model')

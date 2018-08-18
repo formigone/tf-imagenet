@@ -84,9 +84,10 @@
     }
 
     title.textContent = `${index + 1}/${col.length}`;
+    const images = grid.querySelectorAll('img');
     for (let i = 0; i < col[index].length; i++) {
-      if (col[index][i] && grid.children[i]) {
-        grid.children[i].setAttribute('src', col[index][i]);
+      if (col[index][i] && images[i]) {
+        images[i].setAttribute('src', col[index][i]);
       }
     }
   }

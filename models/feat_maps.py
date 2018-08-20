@@ -4,17 +4,17 @@ import time
 import numpy as np
 import matplotlib.pyplot as plt
 import tensorflow as tf
+import argparse
 
 import inception_v2_bn_adam as inception
 
-flags = tf.app.flags
-flags.DEFINE_string('model_dir', '', 'Path to saved_model')
-flags.DEFINE_string('input_img', '', 'Path to image to visualize')
-flags.DEFINE_integer('width', 224, 'New image width after resize')
-flags.DEFINE_integer('height', 224, 'New image height after resize')
+flags = argparse.ArgumentParser()
+flags.add_argument('--model_dir', type=str, default='', help='Path to saved_model')
+flags.add_argument('--input_img', type=str, default='', help='Path to image to visualize')
+flags.add_argument('--width', type=int, default=224, help='New image width after resize')
+flags.add_argument('--height', type=int, default=224, help='New image height after resize')
 
-args = flags.FLAGS
-args._parse_flags()
+args = flags.parse_args()
 
 estimator = tf.estimator.Estimator(model_dir=args.model_dir, model_fn=inception.model_fn, params={})
 

@@ -77,9 +77,6 @@ def gen_input(filename, batch_size=16, repeat=1, buffer_size=1, img_shape=(128, 
 
     iterator = dataset.make_one_shot_iterator()
     features, labels = iterator.get_next()
-    print('-----------')
-    print(features)
-    print('-----------')
     return features, labels
 
   return input_fn
